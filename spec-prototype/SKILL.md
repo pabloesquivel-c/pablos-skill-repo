@@ -15,8 +15,9 @@ description: >-
   back into the spec. Triggers on: prototype this spec, build a prototype,
   interactive prototype, clickable prototype, html prototype, prove the
   mechanics, does this flow work, test the interaction model, prototype
-  findings, what the prototype taught us, feed this back into the spec, state
-  matrix, mock data, medium fidelity.
+  findings, what the prototype taught us, feed this back into the spec, team
+  feedback on the prototype, feedback from the walkthrough, another round of
+  the prototype, state matrix, mock data, medium fidelity.
 argument-hint: "[approved spec: link, paste, or file] [optional: observations from using the prototype]"
 ---
 
@@ -69,10 +70,10 @@ if nothing was given, ask for the spec. don't start.
 
 check in this order. first match wins.
 
-**debrief** — the input contains observations from someone *using* a prototype ("clicked through
-it", "the filter felt wrong", pasted test notes, a state url). check this first: a working
-prototype plus one observation must not get misrouted into a rebuild, or the finding is lost and
-the build happens twice.
+**debrief** — the input contains reactions from people who *used* a prototype: a slack thread, a
+granola transcript or meeting note, notes from a walkthrough, a state url, or "the filter felt
+wrong". check this first: a working prototype plus one reaction must not get misrouted into a
+rebuild, or the finding is lost and the build happens twice.
 
 **build** — everything else. one check inside it, not a question: a prototype for this spec already
 exists at the target path → extend it in place and say which parts you're rebuilding. never fork a
@@ -87,12 +88,14 @@ no prototype for this spec → building. 2 screens, 9 states.
 
 never ask which mode. it's computable from the input.
 
-**debrief never touches the prototype.** it reads the observations and the assumptions panel,
-produces findings, and hands to `/spec-audit` sync mode. an obvious fix goes in the findings as a
-proposed spec change, not into the html — the moment debrief can edit, the loop stops closing.
+**debrief never edits the prototype in the same pass** — not because the prototype shouldn't
+change, but because of the order. it reads the reactions and the assumptions panel, produces
+findings, and hands to `/spec-audit` sync mode. **the spec changes first, then the prototype gets
+rebuilt from it** in build mode. patch the html directly and the two drift apart, and by round
+three nobody knows which one is the truth.
 
-the separation is not bureaucracy: **findings written in the same turn as the build are, by
-construction, only what you already knew from the spec.** what makes a finding worth anything
+the turn boundary is not bureaucracy either: **findings written in the same turn as the build are,
+by construction, only what you already knew from the spec.** what makes a finding worth anything
 arrives when a human uses the thing.
 
 ## the workflow
@@ -105,9 +108,23 @@ spec (tagged)
 → skeleton + mock data + core interactions  ── stop 2, one scoped question
 → states, edges, assumptions panel
 → hand over, then stop
-→ [a human uses it]
-→ debrief → findings → /spec-audit sync
+→ [the team walks through it]
+→ debrief: slack thread / granola notes → findings
+→ /spec-audit sync → spec updated
+→ back to build mode: rebuild from the updated spec  ─┐
+                                                      │
+   ← ← ← ← ← ← ← round 2, 3, … ← ← ← ← ← ← ← ← ← ← ← ←┘
 ```
+
+this runs more than once, and each round is cheaper than the last — the harness is verbatim, so
+only the screens change. say which round you're on.
+
+**the loop exits when the prototype stops teaching you anything:** a round produces no p0 or p1
+findings, the assumptions panel has no `needs decision` rows left, and every task in the script
+completes without a reviewer asking what something does. that's the version that's ready for
+design. **say so explicitly when you reach it** — "round 3 produced no new findings; this is ready
+for design" — because a loop with no stated exit runs one round too many, and the tell is that the
+feedback has quietly turned into visual preferences.
 
 ### 1. recon
 
@@ -259,10 +276,26 @@ it.
 run /spec-audit in sync mode with the rows above as the decisions.
 ```
 
+**fetch the feedback in full.** a slack thread via the slack integration, a meeting via granola
+(`get_meeting_transcript`), a linear or notion comment via its own. read the whole thing — never
+debrief from a summary of a conversation, including your own memory of one. a walkthrough's most
+useful line is usually an aside, and asides are the first thing a summary drops.
+
 **a finding names something that changed because the prototype existed.** if you could have written
 it from the spec alone it is not a finding — it's an assumption, and it belonged in the panel. every
 finding cites the task or the forced state where it surfaced (`?s=detail&state=empty`). **no
 citation, no row.**
+
+**separate what people saw from what they'd prefer.** a group walkthrough produces both, and they
+carry completely different weight. "three of us couldn't tell which items needed attention" is an
+observation: the mechanic failed, and it's a finding. "i'd have used a drawer here" is a preference:
+log it, don't act on it, and don't let it into the spec as a requirement. count how many people hit
+the same thing — one person's stumble is a note, three people's is a p0.
+
+**when two reviewers contradict each other, that's a spec gap, not a design problem.** they're
+reading the same screen against different assumptions about what it's for, which means the spec
+never said. it goes to `/spec-audit` as a `[needs decision]`, not to you as a design call to
+arbitrate.
 
 **findings never contain visual or component recommendations.** that the spacing works is not a
 finding. component choice is the next stage of the pipeline, and answering it here forecloses it.
