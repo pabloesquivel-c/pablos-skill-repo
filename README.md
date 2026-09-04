@@ -20,7 +20,7 @@ Options:
 
 | Skill | What it does |
 | --- | --- |
-| [`spec-audit`](spec-audit/SKILL.md) | Audits a product spec before design starts — grades gaps p0/p1/p2, asks instead of inventing, returns an improved draft |
+| [`spec-audit`](spec-audit/SKILL.md) | Audits a product spec before design starts — grades gaps p0/p1/p2, flags bloat, asks instead of inventing, returns an improved draft or a lean rewrite |
 | [`visual-explainer`](visual-explainer/SKILL.md) | Builds a self-contained, visual HTML page that teaches any topic in depth |
 
 ## Structure

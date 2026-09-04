@@ -2,23 +2,34 @@
 name: spec-audit
 description: >-
   Audits a product spec before design starts and makes it design-ready.
-  Finds missing or vague areas, grades each gap p0/p1/p2, classifies it as
-  safe to infer, best-practice default, or product-specific decision, then
-  proposes fixes and produces an improved spec draft where every line is
-  marked confirmed, inferred, suggested, or needs decision. Never silently
-  invents product-specific rules. Use when a spec is about to go into design,
-  when a Linear or Notion spec needs updating after decisions were locked in,
-  or when a rough idea needs turning into a spec. Works for components,
-  screens, flows, and larger features. Triggers on: spec audit, audit this
-  spec, is this spec ready, design-ready, spec review, fill the gaps in this
-  spec, write a spec, update the spec, design readiness.
-argument-hint: "[spec link, pasted spec, or rough idea] [optional: decisions to fold in]"
+  Catches both failure modes: missing or vague areas that force design to
+  invent, and bloat — repetition, over-detail, premature solutions, and
+  future ideas mixed into v1 — that hides the decisions which matter. Grades
+  each gap p0/p1/p2, classifies it as safe to infer, best-practice default,
+  or product-specific decision, lists simplification opportunities, then
+  produces an improved spec draft where every line is marked confirmed,
+  inferred, suggested, or needs decision. Can also compress a long spec into
+  a lean one without losing a requirement. Never silently invents
+  product-specific rules. Use when a spec is about to go into design, when a
+  Linear or Notion spec needs updating after decisions were locked in, when a
+  rough idea needs turning into a spec, or when a spec has grown too long to
+  act on. Works for components, screens, flows, and larger features. Triggers
+  on: spec audit, audit this spec, is this spec ready, design-ready, spec
+  review, fill the gaps in this spec, write a spec, update the spec, design
+  readiness, compress this spec, spec is too long, trim the spec, simplify
+  the spec, lean spec, cut this down, too much detail, spec bloat.
+argument-hint: "[spec link, pasted spec, or rough idea] [optional: decisions to fold in, or 'compress']"
 ---
 
 # spec audit
 
-your job is to make specs more design-ready by identifying gaps and proposing
-reasonable product/ux defaults.
+your job is to make specs more design-ready by identifying gaps, cutting noise, and
+proposing reasonable product/ux defaults.
+
+two failures cost the same thing. a vague spec makes design invent. a bloated spec
+makes design unable to see what matters. so a great spec is not long or short — it is
+**decision-dense**. every line should help answer why, what, how it behaves, what's in
+and out, or what done means. a line that helps none of those should be compressed.
 
 you may infer standard software behavior when safe.
 you may suggest best-practice defaults when common patterns apply.
@@ -28,9 +39,9 @@ mark every addition as confirmed, inferred, suggested, or needs decision.
 **the principle behind all of it: you can propose, but you must not silently decide.**
 
 you are not a replacement for product thinking. you are a spec co-pilot that says:
-here's what's missing, here's what usually happens in good software, here's what a
-notion/linear/attio-level team would probably define, here's what still needs a
-human, here's a cleaner draft to review.
+here's what's missing, here's what's noise, here's what usually happens in good
+software, here's what a notion/linear/attio-level team would probably define, here's
+what still needs a human, here's a cleaner draft to review.
 
 ## when to use
 
@@ -38,6 +49,7 @@ human, here's a cleaner draft to review.
 - decisions got locked in a call/slack/this conversation and the spec needs to match
 - a rough idea needs turning into a real spec
 - a component, screen, flow, or feature spec needs a gap pass before handoff
+- a spec has grown long enough that nobody can find the decisions inside it
 
 **not for:** critiquing existing UI, writing tickets, estimating, or picking components.
 
@@ -62,6 +74,21 @@ check in this order. first match wins.
 good spec plus one new decision must not get misrouted into audit, or the update
 gets lost.
 
+**compress** — the spec is bloated, not thin. compress if the user asks for it ("too
+long", "trim this", "compress", "make it lean", "cut this down") **or** if **decision
+density** is under half.
+
+density is counted in **statements** — a sentence or a bullet — not physical lines,
+because specs are wrapped prose and line breaks mean nothing. count the statements that
+help answer why, what, how it behaves, what's in and out, what done means, or what is
+explicitly still open. divide by the total. background prose, the same rule restated,
+implementation notes, and discussion that never rules don't count. **a crisp open
+question does count** — naming an unknown is the spec doing its job, and a metric that
+punishes that would push specs toward pretending.
+
+if the rebuild score below is 6 or more, rebuild wins — a thin spec has nothing to
+compress, however rambling it reads.
+
 **rebuild** — score all 10 checklist sections: present and usable `0`,
 present but vague `0.5`, absent `1`. rebuild if the total is **6 or more**, or if
 *why* and *user goal* are both absent.
@@ -73,6 +100,7 @@ sentence:
 
 ```
 7/10 sections absent or unusable → rebuilding from zero.
+12 of 40 statements carry a decision → compressing.
 ```
 
 never ask which mode to use. it's computable from the input.
@@ -80,6 +108,17 @@ never ask which mode to use. it's computable from the input.
 ### what each mode does
 
 **audit** — the full loop below, ending in the output template.
+
+**compress** — the same loop, a different deliverable. gaps still get found; the output
+is a lean spec instead of a 10-section one.
+1. run the bloat pass (step 3) first and hard. it's the reason you're in this mode
+2. then run the rest of the loop normally. bloat and gaps are independent — a spec long
+   enough to need compressing is usually also missing something
+3. output the **lean spec** instead of the improved draft, every line still tagged
+4. output the **disposition ledger** — every line you removed, marked merged, moved, or
+   dropped. it's the proof you lost nothing, and it's a deliverable, not a footnote
+5. keep the gaps table, **p0 and p1 only**. p2s in a compress pass are noise about noise
+6. never lower design-readiness because a spec was bloated. noise is not a gap
 
 **sync** — diff and merge, not re-audit.
 1. list the decisions you extracted, so the human can confirm you read them right
@@ -115,6 +154,7 @@ never interview and hand back a polished 10-section spec in one turn.
 input spec
 → audit against the 10-section checklist
 → contradiction pass
+→ bloat pass
 → identify p0/p1/p2 gaps
 → classify each gap: safe to infer / best-practice default / product-specific
 → propose fixes
@@ -183,7 +223,74 @@ most are p1, a few are p2. don't list them unless they actually apply.
 - **microinteractions and naming inconsistencies** — p2. only mention if the
   inconsistency would confuse a reader
 
-## step 3 — severity
+## step 3 — the bloat pass
+
+now run the opposite pass. absence has a twin: a spec can also say too much, and a
+checklist for missing information will happily grade a bloated spec as complete.
+
+ask this of every section:
+
+> is this helping design move faster, or making the work harder to understand?
+
+### the eight noise types
+
+one clear instance is enough to fire a detector. the `type` column in the output uses
+these exact words, nothing else.
+
+| type | what fires it | how to compress it |
+|---|---|---|
+| duplicate | the same requirement stated more than once, in different words or in different sections | one line, in the section that owns it |
+| too detailed | a rule specified past the point where a design decision changes | keep the rule, drop the parameters |
+| implementation detail | how it's built, with no consequence the user can see | drop it, or restate it as the user-visible effect |
+| solution too early | a specific UI answer stated where the user need belongs | the need, then `suggested pattern:` |
+| not v1 | real behavior, wrong phase, stated as a requirement | move to out of scope or later |
+| background noise | company or product context that changes no design decision | 2–4 bullets under *relevant context* |
+| unclear decision | discussion, options, or notes with no ruling | one `[needs decision]` line in open questions |
+| misplaced content | a real requirement living in a section that doesn't own it | move it to the section that does |
+
+the one real overlap, so nobody has to think about it twice: if the detail has a
+consequence the user can see, it's **too detailed** — keep the rule, drop the numbers.
+if it has none, it's **implementation detail** — drop it, or restate the effect.
+
+```markdown
+duplicate              four lines all saying requirements can be searched
+→ what survives        users can search requirements by name
+
+too detailed           use a debounce of 250ms and store the query in local state
+→ what survives        search results update as the user types
+
+solution too early     use a right-side drawer, 420px wide
+→ what survives        the user needs to inspect source details without losing
+                       context. suggested pattern: side drawer
+
+not v1                 handle localization for 12 languages
+→ what survives        later: localization behavior
+
+unclear decision       three paragraphs weighing tabs against a filter, no ruling
+→ what survives        [needs decision] tabs or a filter for needs-attention?
+```
+
+### what is not bloat
+
+this pass eats good specs unless you hold the line here. none of these are findings:
+
+- a long field or enum list in *data needed* — that's the section doing its job
+- *done when* restating a behavior rule — acceptance criteria are meant to be redundant
+- a long *out of scope* — that section exists to be long, and it's the cheapest one
+- a long *open questions* — that's the spec being honest, not the spec being vague
+- externally dictated wording that reads verbose: legal, compliance, contractual copy
+- a rule that's specific because the domain is specific. "must be filed within 15
+  working days" is a requirement. "250ms debounce" is an implementation detail. if the
+  number came from the business, keep it
+
+and the mirror of the anti-inflation rule in the next step: every row you list names a
+concrete reason a reader is slowed down by it. if you can't finish "this makes the work
+harder to understand because ___", it isn't a finding — cut the row, not the spec.
+
+**cap at 10 rows, and merge repeats.** the same rule stated four ways is one row, not
+four. thirty lines of background is one row, not thirty.
+
+## step 4 — severity
 
 apply the test. don't pattern-match a list.
 
@@ -239,7 +346,7 @@ severity inflation is the most common way this output becomes useless. so:
 3. if p0 + p1 together exceed ~8, stop listing individually and say the spec is
    closer to a rebuild.
 
-## step 4 — classify every gap
+## step 5 — classify every gap
 
 **check this table first. only run the tree if the case isn't listed.** these recur
 every run and shouldn't be re-litigated each time.
@@ -271,7 +378,7 @@ a destructive action implies confirmation. a search input implies no-results.
 → fill it. tag `[inferred]`.
 
 **2. best-practice default** — is there one dominant pattern in good software that any
-reviewer would accept without debate? the flow library in step 5 is this list.
+reviewer would accept without debate? the flow library in step 6 is this list.
 → propose it. tag `[suggested]`. never silently adopt it.
 
 **3. product-specific decision** — does the answer depend on business rules,
@@ -297,7 +404,7 @@ user's edits" is product-specific, because conflict resolution is a business rul
 **tie-breaker:** if guessing wrong would be expensive to undo or embarrassing in
 front of a customer, it's product-specific.
 
-## step 5 — best-practice default library
+## step 6 — best-practice default library
 
 what to check for and propose. always tagged `[suggested]`. never pasted in wholesale
 — take only what the spec actually needs.
@@ -354,7 +461,7 @@ edit, or cancel before high-risk execution · show confidence and uncertainty wh
 relevant · failures should be explainable and recoverable · maintain an audit trail
 for important actions · don't make chat the only place where state exists
 
-## step 6 — tag every line of the draft
+## step 7 — tag every line of the draft
 
 every line in the improved spec draft carries **exactly one** tag. no untagged prose.
 
@@ -392,6 +499,11 @@ hedging.
 | gap | severity | type | why it matters | suggested fix | needs human? |
 |---|---|---|---|---|---|
 
+## simplification opportunities
+
+| issue | type | why it adds noise | suggested compression |
+|---|---|---|---|
+
 ## safe inferred fixes
 things i can add based on standard product behavior:
 -
@@ -427,6 +539,15 @@ example rows, for calibration:
 | unclear who can add context | p0 | product-specific | affects permissions and UI visibility | define roles allowed to add context | yes |
 ```
 
+```markdown
+| issue | type | why it adds noise | suggested compression |
+|---|---|---|---|
+| search stated in 4 places | duplicate | a reader can't tell if that's one rule or four | one line: users can search requirements by name |
+| 250ms debounce specified | implementation detail | no consequence the user can see; it's an engineering call | results update as the user types |
+| localization for 12 languages | not v1 | longest section in the spec, and not this version | move to later |
+| "right-side drawer, 420px" | solution too early | closes the design question before design opens it | state the need, suggest the pattern |
+```
+
 keeping it concise happens **inside** the sections, not by cutting them:
 
 - table cells are phrases, not sentences. one line per row
@@ -436,7 +557,10 @@ keeping it concise happens **inside** the sections, not by cutting them:
 - assumptions are one line each, and only for things that would change the design if wrong
 - change log is one line per changed section
 - **drop any section that would be empty.** keep every section that has content, even
-  if it's one line. an empty heading is noise; a short section is fine
+  if it's one line. an empty heading is noise; a short section is fine. a clean spec
+  with nothing to compress simply has no *simplification opportunities* section
+- **simplification rows cap at 10**, repeats merged. the `type` column is exactly one
+  of the eight words in step 3, with no qualifier
 - **questions cap at 5.** more than 5 → merge them. a long question list is usually
   3 real questions asked 3 ways. overflow stays in the table, not the list
 - each question is: the question · why it matters · 2–3 options with a recommended
@@ -444,9 +568,45 @@ keeping it concise happens **inside** the sections, not by cutting them:
   recommending a default is what makes a question answerable in one line instead of
   starting a meeting
 
+### compress mode output
+
+same summary line and the same simplification table, then this in place of the
+improved spec draft.
+
+the lean spec is **the same ten sections from step 1, in the same order, with the noise
+taken out**. there is no second format to learn — that's the point. a lean spec is a
+short version of a normal spec, not a different artifact.
+
+```markdown
+# lean spec
+[the ten sections, every line tagged, nothing that isn't decision-dense]
+
+## what moved
+
+| original | disposition | where it went |
+|---|---|---|
+
+## gaps found — p0 and p1 only
+
+| gap | severity | type | why it matters | suggested fix | needs human? |
+|---|---|---|---|---|---|
+```
+
+every line of the lean spec still carries exactly one tag. compression is the easiest
+place in this whole skill to launder a `[needs decision]` into confident prose, because
+the output is *supposed* to read cleaner than the input. a lean spec that reads clean
+because the uncertainty was written out of it is the worst thing this mode can produce.
+
+the ledger is not a footnote. one row per line you merged, moved, or dropped — lines you
+kept as-is don't need a row. `disposition` is exactly one of **merged · moved ·
+dropped**, and `dropped` names the noise type that justified it. if the ledger and the
+lean spec disagree, the ledger is what's wrong. fix it before sending.
+
 **mode variations:** in sync mode the change log moves to the top and the gaps table
 covers only new ambiguity. in rebuild mode the first turn is the interview plus a
 tagged skeleton — no gaps table yet; the full template comes on the audit pass after.
+in compress mode the lean spec and the ledger replace the improved draft, and the gaps
+table drops its p2s.
 
 ## guardrails
 
@@ -462,8 +622,19 @@ and, each one checkable:
   `[confirmed]` or `[needs decision]` tag gets deleted. you invented it
 - **never invent a field name, enum value, or data source.** if a flow needs data the
   spec doesn't describe, that's a product-specific gap. ask what exists
-- **preserve the author's voice.** edit only vague or missing spans. if you rewrote a
-  sentence that had no flagged gap, revert it
+- **preserve the author's voice.** in audit and sync: edit only vague or missing spans,
+  and if you rewrote a sentence that had no flagged gap, revert it. in compress: keep
+  the author's terminology and phrasing in every line you keep. you may merge, move and
+  drop — you may not restyle a line you aren't merging, moving or dropping
+- **compressing never deletes a requirement.** preserve every confirmed p0 and p1. a
+  behavior rule, a data item, or a state is never dropped — it moves to out of scope,
+  later, notes, or open questions. only duplicate, background noise, and implementation
+  detail can be dropped outright, and each dropped line says which one it was
+- **account for every line you removed.** the ledger carries every merge, move and drop.
+  a line that appears in neither the lean spec nor the ledger is a lost requirement, and
+  that is the one failure this mode exists to prevent
+- **compressing is not permission to add.** no-new-scope applies here too. a shorter
+  spec with a new idea smuggled into it is a worse outcome than the long one
 - **cap at ~12 gaps**, max 5 p2s, ranked by severity
 - **improved draft no longer than the original**
 - **never edit the source doc.** output the draft in the conversation for the human
@@ -473,14 +644,17 @@ and, each one checkable:
 ## self-check before you send
 
 1. mode announced with its reason?
-2. every draft line has exactly one tag?
+2. every draft line has exactly one tag — lean spec included?
 3. every p0 has a concrete consequence written out? p0 count ≤ 4?
 4. every best-practice default re-checked against money / permissions / legal / customer promise?
 5. no invented field names, enums, or data sources?
 6. *in scope* and *core flow* didn't grow?
-7. ≤ 5 questions, ≤ 12 gaps, ≤ 5 p2s?
-8. reads like plain english a non-technical person can act on?
+7. every simplification row names why a reader is slowed down? ≤ 10 rows, repeats merged?
+8. readiness graded on gaps alone — not downgraded because the spec was long?
+9. compressing: every removed line in the ledger, and no rule, data item or state dropped?
+10. ≤ 5 questions, ≤ 12 gaps, ≤ 5 p2s?
+11. reads like plain english a non-technical person can act on?
 
-if unsure about severity or classification, check
-[EXAMPLES.md](EXAMPLES.md) for calibration — it has the worked audit and the
-good-vs-bad pairs for each of these failure modes.
+if unsure about severity, classification, or how much to cut, check
+[EXAMPLES.md](EXAMPLES.md) for calibration — it has the worked audit, the worked
+compress, and the good-vs-bad pairs for each of these failure modes.

@@ -2,7 +2,7 @@
 
 calibration for [SKILL.md](SKILL.md). read the good-vs-bad pairs when you're unsure
 about severity or classification. read the worked audit when you're unsure about
-length and tone.
+length and tone, and the worked compress when you're unsure how much to cut.
 
 ---
 
@@ -490,3 +490,241 @@ action — but the spec gets credit for having asked.
 
 the value you add here isn't finding the question. it's turning it into two options
 and a recommended default, so it's answerable in one line instead of in a meeting.
+
+---
+
+## 11. worked compress
+
+the same requirements screen as section 1, specced the other way wrong. section 1 was
+starved; this one is fed too much. both are undesignable.
+
+### input spec (as received)
+
+```markdown
+requirements section
+
+background
+our product helps teams respond to complex public applications. these applications are
+long and our customers are usually small teams competing against much larger ones,
+which is why we started the company. the requirements section is part of the
+application flow, which is the core of the product and where most of our usage happens.
+we have been iterating on this area since last year and learned a lot from customer
+calls. requirements are loaded from the application document by our parser.
+requirements always belong to exactly one application.
+
+what we need
+users can search requirements. there should be a search bar that filters the
+requirements list. requirements can be searched by name. users may also find a
+requirement using search when the list is long.
+
+use a debounce of 250ms on the search input and store the query in local state so we
+don't refetch on every keystroke. the list should use the existing table component
+with virtualization if there are more than 100 rows.
+
+for viewing a requirement's source, use a right-side drawer at 420px wide with the
+source excerpt at the top and the parser confidence below it.
+
+we discussed whether needs-attention should be a separate tab or a filter on the main
+list. a tab is more discoverable but splits the count in two places. a filter keeps
+one list but is easier to miss. both work. worth thinking about.
+
+we will also need to handle localization for the 12 languages we plan to support, and
+eventually bulk-resolving warnings, and an activity feed per requirement.
+
+requirements are grouped by requirement type, with subcategory nested one level.
+```
+
+### output
+
+```markdown
+5 of 23 statements carry a decision → compressing.
+
+## summary
+- design-readiness: needs fixes
+- main risk: the two real decisions in here — how source is inspected, and whether needs-attention is a tab or a filter — are buried under background, parameters, and future phases
+- recommended next step: confirm the lean spec below is still your spec, then answer the two open questions
+- confidence: high — nothing is missing that matters; it's all present and hard to find
+
+## simplification opportunities
+
+| issue | type | why it adds noise | suggested compression |
+|---|---|---|---|
+| search stated 4 ways | duplicate | a reader can't tell if that's one rule or four | one line: users can search requirements by name |
+| 250ms debounce, local state | implementation detail | no consequence the user can see | results update as the user types |
+| existing table component, virtualization over 100 rows | implementation detail | how it's built; the requirement is that long lists stay usable | long lists stay usable — engineering picks the mechanism |
+| "right-side drawer, 420px, excerpt above confidence" | solution too early | closes the design question before design opens it | state the need, suggest the pattern |
+| 6 lines of company history | background noise | the founding story changes no decision on this screen | 2 bullets of relevant context |
+| tab vs filter discussion | unclear decision | 4 lines of weighing with no ruling, read as if it were a requirement | one [needs decision] line |
+| localization, bulk resolve, activity feed | not v1 | three future phases sitting in the same list as v1 work | move to out of scope |
+| grouping rule at the end, under background | misplaced content | the screen's whole information architecture, filed last | move to behavior rules |
+
+## lean spec
+
+**why**
+[confirmed] requirements are parsed out of an application document, and users need to find and check them before submitting
+[needs decision] what goes wrong today — the spec says the area matters, not what's broken
+
+**user goal**
+[inferred] as an applicant, i want to find a requirement and check what it's based on, so i can trust the application before i submit it
+
+**in scope**
+[confirmed] requirements list, grouped by type
+[confirmed] search requirements by name
+[confirmed] inspect what a requirement was parsed from
+
+**out of scope**
+[confirmed] localization (per the spec: a later phase)
+[confirmed] bulk-resolving warnings
+[confirmed] per-requirement activity feed
+
+**core flow**
+[confirmed] 1. user opens the requirements section
+[confirmed] 2. user scans requirements grouped by type, or searches by name
+[confirmed] 3. user opens a requirement's source to check it
+[inferred] 4. user returns to the list with their place kept
+
+**behavior rules**
+[confirmed] grouping is by requirement type, subcategory nested one level
+[confirmed] search filters the list by requirement name
+[suggested] results update as the user types
+[confirmed] a requirement's source shows the parsed excerpt and the parser's confidence
+[suggested] source is inspected without leaving the list — side drawer is the obvious pattern, but that's design's call
+[inferred] long requirement lists stay usable; the mechanism is engineering's call
+[needs decision] is needs-attention a tab or a filter?
+
+**data needed**
+[confirmed] requirement name
+[confirmed] the source excerpt a requirement was parsed from
+[confirmed] parser confidence
+[confirmed] requirement type and subcategory
+[confirmed] a requirement belongs to exactly one application
+[needs decision] anything else on a requirement — engineering to confirm; i won't guess field names
+
+**key states**
+[inferred] default list
+[inferred] empty — no requirements parsed yet
+[inferred] loading
+[inferred] error on load, with retry
+[inferred] search with no results
+[needs decision] what a low-confidence parse looks like, if it looks like anything
+
+**open questions**
+[needs decision] tab or filter for needs-attention — the spec weighed both and didn't rule
+[needs decision] what problem this fixes today, in one line
+
+**done when**
+[needs decision] acceptance criteria — the spec has none. one observable check per in-scope item plus the five states above
+
+## what moved
+
+| original | disposition | where it went |
+|---|---|---|
+| 4 search sentences | merged | one behavior rule |
+| 250ms debounce, local state | dropped — implementation detail | replaced by "results update as the user types" |
+| table component, virtualization over 100 | dropped — implementation detail | replaced by "long lists stay usable" |
+| drawer at 420px, excerpt above confidence | moved | behavior rules, as a need plus a suggested pattern |
+| 6 lines of company background | dropped — background noise | the two lines that mattered are now in *why* and *data needed* |
+| tab vs filter discussion | moved | open questions, as one [needs decision] |
+| localization, bulk resolve, activity feed | moved | out of scope |
+| grouping rule | moved | background → behavior rules |
+
+## gaps found — p0 and p1 only
+
+| gap | severity | type | why it matters | suggested fix | needs human? |
+|---|---|---|---|---|---|
+| tab or filter for needs-attention | p1 · already open | product-specific | it's the list's primary navigation | (a) filter, one list, one count — recommended, (b) tab | yes |
+| no acceptance criteria | p1 | best-practice default | nobody can agree when this is done | 5–8 observable checks | no |
+| low-confidence parse behavior undefined | p1 | product-specific | confidence is displayed, so it implies a threshold nobody has set | define what counts as low, and what the user does about it | yes |
+```
+
+where `5 of 23` comes from, since the number is what justifies the mode: 23 statements
+in, and only five help answer anything — requirements come from the parser, a
+requirement belongs to one application, search is by name, source shows excerpt and
+confidence, grouping is by type with subcategory nested. the other eighteen are
+background, the same search rule three more times, two implementation notes, five lines
+of undecided discussion, and three future phases.
+
+note what compressing did **not** do. it didn't lower readiness for being long — the
+verdict is `needs fixes` on the three gaps, not on the bloat. it didn't rule on tabs vs
+filter, because the spec explicitly didn't. and every one of the eight rows in the
+simplification table appears again in the ledger, which is the only reason you can
+trust the short version.
+
+---
+
+## 12. over-compression
+
+the failure mode of this mode. it looks like excellent editing.
+
+**bad**
+
+```markdown
+**behavior rules**
+requirements are grouped by type.
+search filters by name.
+source opens in a drawer showing the excerpt and confidence.
+needs-attention is a filter on the main list.
+```
+
+four clean lines, and three things went wrong. "subcategory nested one level" was
+deleted as too detailed — it's the information architecture of the screen, and it came
+from the author. the tab-vs-filter question got *resolved* into a confirmed-looking
+statement, which is the exact laundering the tags exist to stop. and the tags are gone,
+so a reader can't tell any of this happened.
+
+short and wrong is worse than long and complete. the long version at least still had
+the decision in it.
+
+**good**
+
+```markdown
+**behavior rules**
+[confirmed] grouping is by requirement type, subcategory nested one level
+[confirmed] search filters the list by requirement name
+[confirmed] source shows the parsed excerpt and the parser's confidence
+[needs decision] is needs-attention a tab or a filter? the spec weighed both, didn't rule
+
+## what moved
+| original | disposition | where it went |
+|---|---|---|
+| tab vs filter discussion | moved | open questions |
+```
+
+the check that catches it: a behavior rule, a data item, or a state is never *dropped*.
+it can be merged, or moved, and either way it shows up in the ledger. if the ledger has
+no row for it, it wasn't compressed — it was lost.
+
+---
+
+## 13. a good spec, run through the bloat pass
+
+the pass has to be able to return nothing, or it will find something every time.
+
+the spec has 14 fields listed under *data needed*, an *out of scope* section with 6
+items, a *done when* section that restates three behavior rules as observable checks,
+and 4 open questions.
+
+**bad**
+
+```markdown
+## simplification opportunities
+| 14 fields listed | too detailed | most of these don't change the layout | list the 4 that appear on the row |
+| done when repeats behavior rules | duplicate | already stated above | remove the repetition |
+| 6 items in out of scope | background noise | none of this is being built | trim to the 2 likely to come up |
+| 4 open questions | unclear decision | the spec doesn't rule on these | resolve them |
+```
+
+every row is wrong, and the last one is dangerous — it reads as an instruction to
+decide things the team deliberately hasn't. this is a spec being punished for doing its
+job, and it's the same error as severity inflation wearing different clothes.
+
+**good**
+
+```markdown
+no simplification opportunities — the spec is dense. the field list, the out of scope
+section, and the repeated acceptance criteria are all those sections working correctly.
+```
+
+then the audit proceeds normally. `38 of 44 statements carry a decision` never routed
+to compress in the first place — density was checked and the spec passed. note that the
+4 open questions counted *toward* density, not against it.
