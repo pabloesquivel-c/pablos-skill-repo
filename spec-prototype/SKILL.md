@@ -2,23 +2,19 @@
 name: spec-prototype
 description: >-
   Turns an approved spec into one medium-fidelity interactive HTML prototype
-  that proves the mechanics, states, and interaction model before production,
-  then turns what the prototype taught back into spec changes. Inherits
-  spec-audit's tags: anything rendered from a suggested or undecided spec line
+  that proves the mechanics, states, and interaction model before production.
+  Inherits spec-audit's tags: anything rendered from a suggested or undecided spec line
   shows up in a visible assumptions panel inside the prototype, so a guess
   never reads as a decision. Ships a state toolbar that force-sets every state
   in one click, because a prototype that only demos the happy path proves
   nothing. Convergence, not divergence — for several different answers to one
   UI question, use the prototype skill instead. Use when a spec is
-  design-ready and the open question is whether the thing actually works, or
-  when someone has clicked through a prototype and the findings need to go
-  back into the spec. Triggers on: prototype this spec, build a prototype,
-  interactive prototype, clickable prototype, html prototype, prove the
-  mechanics, does this flow work, test the interaction model, prototype
-  findings, what the prototype taught us, feed this back into the spec, team
-  feedback on the prototype, feedback from the walkthrough, another round of
-  the prototype, state matrix, mock data, medium fidelity.
-argument-hint: "[approved spec: link, paste, or file] [optional: observations from using the prototype]"
+  design-ready and the open question is whether the thing actually works.
+  Triggers on: prototype this spec, build a prototype, interactive prototype,
+  clickable prototype, html prototype, prove the mechanics, does this flow
+  work, test the interaction model, another round of the prototype, state
+  matrix, mock data, medium fidelity.
+argument-hint: "[approved spec: link, paste, or file]"
 ---
 
 # spec prototype
@@ -42,14 +38,16 @@ and the other half: **prototype to answer questions, not to impress people.**
 
 - a spec came out of `/spec-audit` design-ready, and the open question is whether it actually works
 - a flow has enough states, branches, or agent steps that nobody can tell from reading it
-- someone has clicked through a prototype and what they found needs to reach the spec
+- a mechanic needs testing on a real person before design or dev commits
+- a spec changed and the existing prototype needs to catch up
 
 **not this skill:** exploring several genuinely different answers to one UI question. that's
 `prototype` — a divergence skill, N variants behind a visual picker. this one is convergence: one
 approved spec, one prototype, proving the mechanics the spec already decided. if you don't yet know
 what the thing should *be*, run `prototype` first and come back with the winner.
 
-also not for: production code, design-system mapping, visual design, or writing the spec itself.
+also not for: production code, design-system mapping, visual design, or writing and updating the
+spec — that stays with whoever owns it.
 
 ## required inputs
 
@@ -66,38 +64,6 @@ also not for: production code, design-system mapping, visual design, or writing 
 
 if nothing was given, ask for the spec. don't start.
 
-## step 0 — pick the mode, announce it, don't ask
-
-check in this order. first match wins.
-
-**debrief** — the input contains reactions from people who *used* a prototype: a slack thread, a
-granola transcript or meeting note, notes from a walkthrough, a state url, or "the filter felt
-wrong". check this first: a working prototype plus one reaction must not get misrouted into a
-rebuild, or the finding is lost and the build happens twice.
-
-**build** — everything else. one check inside it, not a question: a prototype for this spec already
-exists at the target path → extend it in place and say which parts you're rebuilding. never fork a
-second file for the same spec.
-
-say the mode and the reason in your first line, so a human can veto it in one sentence:
-
-```
-3 observations from a run → debrief, no rebuild.
-no prototype for this spec → building. 2 screens, 9 states.
-```
-
-never ask which mode. it's computable from the input.
-
-**debrief never edits the prototype in the same pass** — not because the prototype shouldn't
-change, but because of the order. it reads the reactions and the assumptions panel, produces
-findings, and hands to `/spec-audit` sync mode. **the spec changes first, then the prototype gets
-rebuilt from it** in build mode. patch the html directly and the two drift apart, and by round
-three nobody knows which one is the truth.
-
-the turn boundary is not bureaucracy either: **findings written in the same turn as the build are,
-by construction, only what you already knew from the spec.** what makes a finding worth anything
-arrives when a human uses the thing.
-
 ## the workflow
 
 ```
@@ -108,23 +74,13 @@ spec (tagged)
 → skeleton + mock data + core interactions  ── stop 2, one scoped question
 → states, edges, assumptions panel
 → hand over, then stop
-→ [the team walks through it]
-→ debrief: slack thread / granola notes → findings
-→ /spec-audit sync → spec updated
-→ back to build mode: rebuild from the updated spec  ─┐
-                                                      │
-   ← ← ← ← ← ← ← round 2, 3, … ← ← ← ← ← ← ← ← ← ← ← ←┘
 ```
 
-this runs more than once, and each round is cheaper than the last — the harness is verbatim, so
-only the screens change. say which round you're on.
+what happens to the prototype afterwards — who reviews it, what they say, how the spec changes — is
+not this skill's job. hand over cleanly and get out of the way.
 
-**the loop exits when the prototype stops teaching you anything:** a round produces no p0 or p1
-findings, the assumptions panel has no `needs decision` rows left, and every task in the script
-completes without a reviewer asking what something does. that's the version that's ready for
-design. **say so explicitly when you reach it** — "round 3 produced no new findings; this is ready
-for design" — because a loop with no stated exit runs one round too many, and the tell is that the
-feedback has quietly turned into visual preferences.
+if the spec comes back changed and a prototype for it already exists, **extend that file in place**
+and say which parts you're rebuilding. never fork a second file for the same spec.
 
 ### 1. recon
 
@@ -251,54 +207,12 @@ then open the file and give exactly four things:
 4. **the assumptions panel, read aloud.** this is the moment tag inheritance is most likely to get
    skipped, so it doesn't get skipped here.
 
-then stop. building and learning are separate asks; the next input has to come from a human using
-it.
+then add anything the *build itself* revealed, which is the one thing you know and the reviewer
+doesn't: **spec lines that couldn't be built as written**, and anything the state matrix forced
+into the open. keep it to a short list. it's raw material for whoever updates the spec, not a
+recommendation about what to do — and it is not a substitute for what people find by clicking.
 
-### 6. debrief → findings
-
-```markdown
-# prototype findings
-
-## what the prototype proved
--
-
-## what it disproved
-| finding | surfaced in | what it changes in the spec | severity |
-|---|---|---|---|
-
-## spec lines that couldn't be built as written
--
-
-## decisions the panel forced into the open
--
-
-## next step
-run /spec-audit in sync mode with the rows above as the decisions.
-```
-
-**fetch the feedback in full.** a slack thread via the slack integration, a meeting via granola
-(`get_meeting_transcript`), a linear or notion comment via its own. read the whole thing — never
-debrief from a summary of a conversation, including your own memory of one. a walkthrough's most
-useful line is usually an aside, and asides are the first thing a summary drops.
-
-**a finding names something that changed because the prototype existed.** if you could have written
-it from the spec alone it is not a finding — it's an assumption, and it belonged in the panel. every
-finding cites the task or the forced state where it surfaced (`?s=detail&state=empty`). **no
-citation, no row.**
-
-**separate what people saw from what they'd prefer.** a group walkthrough produces both, and they
-carry completely different weight. "three of us couldn't tell which items needed attention" is an
-observation: the mechanic failed, and it's a finding. "i'd have used a drawer here" is a preference:
-log it, don't act on it, and don't let it into the spec as a requirement. count how many people hit
-the same thing — one person's stumble is a note, three people's is a p0.
-
-**when two reviewers contradict each other, that's a spec gap, not a design problem.** they're
-reading the same screen against different assumptions about what it's for, which means the spec
-never said. it goes to `/spec-audit` as a `[needs decision]`, not to you as a design call to
-arbitrate.
-
-**findings never contain visual or component recommendations.** that the spacing works is not a
-finding. component choice is the next stage of the pipeline, and answering it here forecloses it.
+then stop. building and reviewing are separate asks.
 
 ## guardrails
 
@@ -339,12 +253,11 @@ finding. component choice is the next stage of the pipeline, and answering it he
 
 ## self-check before you hand over
 
-1. mode announced with its reason?
-2. every state in the matrix reachable in one click, and every replacement state named in the
+1. every state in the matrix reachable in one click, and every replacement state named in the
    negation list of the content it replaces?
-3. every product-specific guess in the panel, with what the spec omitted and why it matters?
-4. no invented field names, enums, or statuses?
-5. one long value, one row of empty optionals, and one edge row visible in the default data?
-6. every control working, disabled, or saying so? console clean?
-7. screens + interaction code at least 3× the harness?
-8. did you check it in a browser, or are you reporting that it works?
+2. every product-specific guess in the panel, with what the spec omitted and why it matters?
+3. no invented field names, enums, or statuses?
+4. one long value, one row of empty optionals, and one edge row visible in the default data?
+5. every control working, disabled, or saying so? console clean?
+6. screens + interaction code at least 3× the harness?
+7. did you check it in a browser, or are you reporting that it works?
