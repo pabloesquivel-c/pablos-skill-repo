@@ -3,8 +3,8 @@ name: spec-prototype
 description: >-
   Turns an approved spec into one medium-fidelity interactive HTML prototype
   that proves the mechanics, states, and interaction model before production.
-  Inherits spec-audit's tags: anything rendered from a suggested or undecided spec line
-  shows up in a visible assumptions panel inside the prototype, so a guess
+  Inherits spec-audit's uncertainty (its open decisions and its assumed line): anything
+  rendered from an undecided or assumed part of the spec shows up in a visible assumptions panel inside the prototype, so a guess
   never reads as a decision. Ships a state toolbar that force-sets every state
   in one click, because a prototype that only demos the happy path proves
   nothing. Convergence, not divergence — for several different answers to one
@@ -54,11 +54,19 @@ spec — that stays with whoever owns it.
 1. **the spec** — linear issue, notion page, doc link, pasted text, or a file. fetch it **in full**
    with whatever integration is available. never prototype a paraphrase or your memory of an
    earlier conversation.
-2. **whether it's tagged.** if it came through `/spec-audit`, the tags are your inheritance map —
-   read them before anything else. **if it isn't tagged, don't refuse.** say so, classify inline at
-   lower confidence using spec-audit's three-way test (safe to infer / best-practice default /
-   product-specific), and note that running `/spec-audit` first would make the assumptions panel
-   trustworthy instead of best-effort.
+2. **whether it came through `/spec-audit`.** if it did, read its uncertainty before anything else —
+   that is your inheritance map. spec-audit no longer puts tags on lines; read it like this:
+   - a numbered item under **decisions needed**, or a "→ decision N" pointer in the body, is a
+     `[needs decision]` row
+   - the **assumed unless you say otherwise** line, and anything you have to add that the body
+     doesn't say, is a `[suggested]` row
+   - every other line of the body is `[confirmed]`
+   - older specs that still carry inline `[tags]` read the same way
+   the tag names below are this skill's own vocabulary for the assumptions panel.
+   **if it didn't come through spec-audit, don't refuse.** say so, classify inline at lower
+   confidence (obvious from the spec / a common pattern / depends on a business rule), and note
+   that running `/spec-audit` first would make the assumptions panel trustworthy instead of
+   best-effort.
 3. optional, use if offered: existing screens to match, figma references, the parent feature spec,
    design tokens, prior mobbin research.
 
@@ -67,7 +75,7 @@ if nothing was given, ask for the spec. don't start.
 ## the workflow
 
 ```
-spec (tagged)
+spec (from spec-audit)
 → recon: stack, tokens, component vocabulary
 → capped interview
 → prototype plan  ── stop 1, approve before any build

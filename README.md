@@ -20,7 +20,7 @@ options:
 
 | skill | what it does |
 | --- | --- |
-| [`spec-audit`](spec-audit/SKILL.md) | audits a product spec before design starts — grades gaps p0/p1/p2, flags bloat, asks instead of inventing, returns an improved draft or a lean rewrite |
+| [`spec-audit`](spec-audit/SKILL.md) | reviews a product spec before design starts and returns the few decisions still open (each with a plain example and a recommended answer) plus a short spec in plain language — asks instead of inventing, and folds team comments back in |
 | [`spec-prototype`](spec-prototype/SKILL.md) | turns an approved spec into one medium-fidelity interactive HTML prototype that proves the mechanics and states, with a toolbar that force-sets every state and a panel marking every guess the spec didn't decide |
 | [`visual-explainer`](visual-explainer/SKILL.md) | builds a self-contained, visual HTML page that teaches any topic in depth |
 
